@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8">
+        <title>D3 US Map</title>
+      
+        <link rel="stylesheet" type="text/css" href="MyStyleSheet.css"/>
+            
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="http://d3js.org/topojson.v0.min.js"></script>
+      
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> 
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+        <!-- Latest compiled JavaScript -->
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+      
+        <script type="text/javascript">
+            
+            var data;
+            var tripDates;
+            var debateData;
+            var debateDates;
+            var links = [];
+            var candidates = ["Ben Townhalls", "Lawrence Lessig", "Lincoln Chafee", "Jim Webb",  "Rick Perry", "Bobby Jindal", "Jim Gilmore", "George Pataki", "Scott Walker", "Mike Huckabee", "Rick Santorum", "Rand Paul", "Lindsey Graham", "Carly Fiorina", "Jeb Bush", "Ben Carson", "Martin O'Malley", "Chris Christie", "Marco Rubio", "John Kasich", "Ted Cruz", "Bernie Sanders",  "Donald Trump", "Hillary Clinton"];
+            var demCandidates = ["Lawrence Lessig", "Lincoln Chafee", "Jim Webb", "Martin O'Malley", "Bernie Sanders", "Hillary Clinton"]
+            var repCandidates = ["Ben Townhalls", "Rick Perry", "Bobby Jindal", "Jim Gilmore", "George Pataki", "Scott Walker", "Mike Huckabee", "Rick Santorum", "Rand Paul", "Lindsey Graham", "Carly Fiorina", "Jeb Bush", "Ben Carson", "Chris Christie", "Marco Rubio", "John Kasich", "Ted Cruz", "Donald Trump"]
+            //var latlongs;
+            var tripDates;
+            var mmddyy_format = d3.time.format("%m/%d/%Y");
+            var ddMMyy_format = d3.time.format("%d-%b-%Y");
+            var longDate_format = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ");
+            var startDate = new Date("2014/11/09").getTime();
+            var epochDay = 24*60*60*1000;
+            var epochDate = ddMMyy_format.parse("10-Nov-2014");
+            //var epochDate = ddMMyy_format.parse("30-Apr-2016");
+            
+            var projection = d3.geo.albersUsa();
+                //.center([0, 0 ])
+                //.scale(100)
+                //.rotate([0,0]);
+            
+            var path = d3.geo.path().projection(projection);
+            
+            function drawMap() {
+                var svg = d3.select("#map");            
+                var g = svg.append("g");
+
+                d3.json("us.json", function(error, topology) {
+                    g.selectAll("path")
+                        // choose counties or states here.
+                        //.data(topojson.object(topology, topology.objects.counties).geometries)
+                        .data(topojson.object(topology, topology.objects.states).geometries)
+                    .enter()
+                        .append("path")
+                        .attr("d", path)
+                        .attr("id", function(d) { return "F" +  d.id});
+                
+                    getData();
+                    
+                });
+                
+            }
+            
+             function getData() { 
+                
+                 //d3.selectAll("svg > *").remove();   // clear the SVG
+                 d3.csv("candidate.csv", function(d) {
+                    
+                    data = d;
+                        
+                    drawRoutes();
+                    drawCities();
+                    //drawRoutes();
+                    listCandidateNames();
+                    listDemNames();
+                    listRepNames();
+                    initialDimAll();
+                    drawTimeline();
+           })}
+            
+            function drawCities() {
+                //map = d3.select("#map")
+            
+                        var point = map.append("g")
+                            .selectAll("g")
+                            .data(data)
+                            //.data(links)
+                            .enter().append("g")
+                            .attr("transform", function(d,i) { return "translate(" + projection([+data[i]["lng"], +data[i]["lat"]]) + ")"; })
+                            .attr("class",function(d,i) {
+                                return "city " + data[i]["candidate"].replace(/ /g,'_').replace(/\'/g,'') + " D" + ddMMyy_format(longDate_format.parse(data[i]["date"]));
+                                })
+                            .on("text", nameHighlight)
+                            .on("mouseover", cityHighlight)
+                            .on("mouseout", cityUnhighlight);
+                        
+                          point.append("circle")
+                            .attr("r", 2); 
+                
+                        //nameHighlight();
+                }
+            
+            
+            function drawRoutes() {
+                
+                candidates.forEach(function(candidateName) { 
+                    
+                     var latlongs = data.filter(function(d) { 
+                        if( d["candidate"] == candidateName) { return d;}})
+                                       
+                    
+                    latlongs.forEach(function(d,i) { if(i==0) {
+                        links.push({type: "LineString", coordinates: [[+latlongs[i]["lng"],+latlongs[i]["lat"]] ,[+latlongs[i]["lng"],+latlongs[i]["lat"]]], candidate: latlongs[i]["candidate"], date: latlongs[i]["date"], from: latlongs[i]["city"] + ', ' + latlongs[i]["state"], to: latlongs[i]["city"] + ', ' + latlongs[i]["state"]})
+                    } else {
+                        links.push({type: "LineString", coordinates: [[+latlongs[i-1]["lng"],+latlongs[i-1]["lat"]] ,[+latlongs[i]["lng"],+latlongs[i]["lat"]]], candidate: latlongs[i]["candidate"], date: latlongs[i]["date"], from: latlongs[i-1]["city"] + ', ' + latlongs[i-1]["state"], to: latlongs[i]["city"] + ', ' + latlongs[i]["state"]})
+                    }
+                                                   
+                    })
+                 }) 
+
+                        map = d3.select("#map")
+                        
+                        var connection = map.selectAll(".route")
+                            .data(links)
+                            .enter().append("path")
+                            .attr("class",function(d,i) { 
+                                return "travelLine  " + links[i].candidate.replace(/ /g,'_').replace(/\'/g,'') + " D" + ddMMyy_format(longDate_format.parse(links[i]["date"]));
+                                })
+                            .attr("d", path)
+                            .style("opacity", 0.3);
+                    
+                  //console.log(links);     
+               
+            }
+
+            
+            function listCandidateNames() {
+                
+//            d3.select("#candidateNames").selectAll("span")
+//                    .data(d3.map(data.results, function(d) {return d.candidate;}).keys())
+//                    .enter().append("span")
+//                    .text(function(d) {return d;})
+//                    .attr("class",function(d) { return d.replace(/ /g,'_');    })
+                    //.attr("onclick",function(d) {return "filter('" + d.replace(/ /g,'_') + "')";});
+            
+//            candidates = d3.map(data.results, function(d) {return d["candidate"];}).keys();
+                
+//            function(d) {return "allCandidates + data["candidate"].replace(/ /g,'_').replace(/\'/g,'') + "')";}
+//            
+        }
+            
+            function listDemNames() {
+                
+            d3.select("#demNames").selectAll("span")
+                    .data(d3.map(demCandidates, function(d) {return d;}).keys())
+                    .enter().append("span")
+                    .text(function(d) {return d;})
+                    .attr("class",function(d) { return "dems " + "N_" + d.replace(/ /g,'_').replace(/\'/g,'');    })
+                    .attr("onclick",function(d) {return "filter('" + d.replace(/ /g,'_').replace(/\'/g,'') + "')";});
+            }
+            
+            function listRepNames() {
+                
+                d3.select("#repNames").selectAll("span")
+                    .data(d3.map(repCandidates, function(d) {return d;}).keys())
+                    .enter().append("span")
+                    .text(function(d) {return d;})
+                    .attr("class",function(d) { return "reps " + "N_" + d.replace(/ /g,'_').replace(/\'/g,'');    })
+                    .attr("onclick",function(d) {return "filter('" + d.replace(/ /g,'_').replace(/\'/g,'') + "')";});
+        }
+            
+            function drawTimeline() {
+                
+                var target = d3.select("#timeline");
+                var top = target.attr("top");
+                var bottom = target.attr("height");
+                var side = target.attr("width");
+                var midline = 48;
+                var startX = 50;
+                //var spacing = 1.845;
+                var spacing = 2;
+                var dayCount = 542;
+                
+//                var text = target.selectAll("text")
+//                .data(data).enter();
+                
+//                var line = target.selectAll("line")
+//                    .data(data).enter(); 
+                
+                d3.csv("timelineTicks.csv", function(d) {
+                    
+                tickData = d;
+                //console.log(tickData);
+                    
+                var timelineTicks = target.selectAll(".ticks")
+                    .data(tickData)
+                    .enter().append("line")
+                    .attr("x1", function(d,i) {return startX + (+longDate_format.parse(tickData[i]["date"])- startDate)/epochDay*spacing;})
+                    .attr("y1", midline)
+                    .attr("x2", function(d,i) {return startX + (+longDate_format.parse(tickData[i]["date"]) - startDate)/epochDay*spacing;})
+                    .attr("y2", midline-37)
+                    .attr("stroke", "#a8a8a8")
+                    .attr("stroke-width", 1)
+                
+                
+                var dayText = target.selectAll("text")
+                .data(tickData)
+                .enter().append("text")
+                .attr("x",  function(d,i) {return startX + (+longDate_format.parse(tickData[i]["date"])- startDate)/epochDay*spacing+2;})
+                .attr("y", midline-30)
+                .text(function (d,i) {return tickData[i]["day"];})
+                .style("text-anchor", "start")
+                .attr("font-size", 10)
+                .attr("fill", "#a8a8a8")
+                
+                var yearText = target.selectAll(".year")
+                .data(tickData)
+                .enter().append("text")
+                .attr("x",  function(d,i) {return startX + (+longDate_format.parse(tickData[i]["date"])- startDate)/epochDay*spacing+2;})
+                .attr("y", midline-41)
+                .text(function (d,i) {if(tickData[i]["day"]=='Jan 1') {
+                    return tickData[i]["year"];
+                }})
+                .style("text-anchor", "start")
+                .attr("font-size", 10)
+                .attr("fill", "#a8a8a8")
+                })
+                
+                d3.csv("timelineHighlights.csv", function(d) {
+                    
+                highlightData = d;
+                //console.log(highlightData);
+                    
+                var timelineHighlight = target.selectAll(".lineHighlights")
+                    .data(highlightData)
+                    .enter().append("line")
+                    .attr("x1", function(d,i) {return startX + (+longDate_format.parse(highlightData[i]["date"])- startDate)/epochDay*spacing;})
+                    .attr("y1", midline)
+                    .attr("x2", function(d,i) {return startX + (+longDate_format.parse(highlightData[i]["date"]) - startDate)/epochDay*spacing;})
+                    .attr("y2", midline+30)
+                    .attr("stroke", "#a8a8a8")
+                    .attr("stroke-width", 1)
+                
+                
+                var dayText = target.selectAll(".textHighlights")
+                .data(highlightData)
+                .enter().append("text")
+                .attr("x",  function(d,i) {return startX + (+longDate_format.parse(highlightData[i]["date"])- startDate)/epochDay*spacing-2;})
+                .attr("y", midline+40)
+                .text(function (d,i) {return highlightData[i]["description"];})
+                .style("text-anchor", "start")
+                .attr("font-size", 10)
+                .attr("fill", "#a8a8a8")
+                })
+                
+                d3.csv("timelineInfo.csv", function(d) {
+
+                debateData = d;
+
+                debateDates = d3.map(debateData, function(d) {return d["date"];}).keys();
+
+//                    debateDates.forEach(function(date) {
+//                        console.log(+longDate_format.parse(date))
+//                    })
+
+                var debateLines = target.selectAll(".debates")
+                .data(debateDates)
+                .enter().append("line")
+                .attr("x1", function(d,i) {return startX + (+longDate_format.parse(debateDates[i])- startDate)/epochDay*spacing;})
+                .attr("y1", midline+25)
+                .attr("x2", function(d,i) {return startX + (+longDate_format.parse(debateDates[i]) - startDate) /      epochDay*spacing;})
+                .attr("y2", midline-25)
+                .attr("stroke", "#a8a8a8")
+                .attr("stroke-width", 2)
+                .attr("stroke-dasharray", "2,2")
+                .attr("class",function(d,i) { 
+                            return "D" + ddMMyy_format(longDate_format.parse(debateDates[i]))})
+                .on("mouseover", debateLineHighlight)
+                .on("mouseout", debateLineUnhighlight);
+
+
+//                    debateInfo = text.append("text")
+//                        .data(debateData)
+//                        .text(function (d,i) {return debateData[i]["description"];})
+//                        .style("text-anchor", "start")
+//                        .attr("font-size", 12)
+//                        .attr("fill", "black")
+//                        .attr("opacity", 1.0);                
+                })
+                
+                tripDates = d3.map(data, function(d) {return d["date"];}).keys();
+                
+                var dateLines = target.selectAll("line")
+                    .data(tripDates)
+                    .enter().append("line")
+                    .attr("x1", function(d,i) {return startX + (+longDate_format.parse(tripDates[i])- startDate)/epochDay*spacing;})
+                    .attr("y1", midline+10)
+                    .attr("x2", function(d,i) {return startX + (+longDate_format.parse(tripDates[i]) - startDate) /      epochDay*spacing;})
+                    .attr("y2", midline-10)
+                    .attr("stroke", "#a8a8a8")
+                    .attr("stroke-width", 2)
+                    .attr("class",function(d,i) { 
+                                return "D" + ddMMyy_format(longDate_format.parse(tripDates[i]))})
+                    .on("mouseover", timeLineHighlight)
+                    .on("mouseout", timeLineUnhighlight);
+           }
+            
+           
+//            function updateDay(nrDays) {
+//                
+//                var epochDays = nrDays * epochDay
+//                var updatedEpochDate = startDate + epochDays
+//                epochDate = new Date(updatedEpochDate)
+//                d3.select("#dayText").text(ddMMyy_format(epochDate));
+//                filterValue(ddMMyy_format(epochDate));
+////                dimAll();
+////                drawCities(epochDate);
+////                drawRoutes(ddMMyy_format(epochDate));
+//                
+//                
+//                //console.log(ddMMyy_format(epochDate));  
+//                //new Date("2016/04/01").getTime()
+//            }
+            
+            
+            function initialDimAll() {
+            var point = d3.selectAll(".city")
+                //.style("opacity", 0.0);
+                .style("visibility", "hidden");
+            var connection = d3.selectAll(".travelLine")
+                //.style("opacity", 0.0);
+                .style("visibility", "hidden");
+            var demCandidates = d3.selectAll(".dems")
+                .style("opacity", 0.3);
+                //.style("visibility", "hidden");
+            var repCandidates = d3.selectAll(".reps")
+                .style("opacity", 0.3);
+                //.style("visibility", "hidden");
+                
+            
+            }
+            
+            function dimAll() {
+            var point = d3.selectAll(".city")
+                .style("visibility", "hidden");
+            var connection = d3.selectAll(".travelLine")
+                .style("visibility", "hidden");    
+            var demCandidates = d3.selectAll(".dems")
+                .style("opacity", 0.3);
+                //.style("visibility", "hidden");
+            var repCandidates = d3.selectAll(".reps")
+                .style("opacity", 0.3);
+                //.style("visibility", "hidden");
+            }
+        
+            function showAll() {
+                var point = d3.selectAll(".city")
+                    .style("visibility", "visible");
+                var connection = d3.selectAll(".travelLine")
+                    .style("visibility", "visible");
+                var demCandidates = d3.selectAll(".dems")
+                .style("opacity", 1.0);
+                //.style("visibility", "hidden");
+                var repCandidates = d3.selectAll(".reps")
+                .style("opacity", 1.0);
+                //.style("visibility", "hidden");
+            }
+        
+            function filter(key) {
+                
+                
+                //console.log(key);
+                var connection = d3.selectAll("."+key);
+                if(connection.style("visibility")=="hidden") {
+                    connection.style("visibility", "visible")
+                } else {
+                    connection.style("visibility", "hidden")
+                } 
+                
+                var candidateName = d3.selectAll(".N_"+key);
+                //console.log(point.style("visibility"));
+                candidateName.style("opacity", function(d) {if(candidateName.style("opacity")==1.0) {return 0.3;} else {return 1.0;}})
+            }
+            
+            function filterValue(value) {
+                dimAll();
+                
+                //console.log(value)
+                
+                var conneciton = d3.selectAll(".D"+value)
+                    .style("visibility", "visible");
+                
+                var theseCandidates = [];
+                data.forEach(function(trip) {
+                        if(ddMMyy_format(longDate_format.parse(trip["date"])) == value) { 
+                            var key = trip["candidate"].replace(/ /g,'_').replace(/\'/g,'');
+                            //console.log(key);
+                            if (theseCandidates.indexOf(key) < 0) {
+                                theseCandidates.push(key);
+                            }
+                        }
+                        
+                        //if(ddMMyy_format(longDate_format.parse(trip["date"])) == value) { var key = trip["candidate"].replace(/ /g,'_').replace(/\'/g,'');}
+                    
+                        //console.log(key);
+                        
+//                        var candidateName = d3.selectAll(".N_"+key)
+//                        .style("opacity", 1.0);
+                })
+                
+                console.log(theseCandidates);
+                theseCandidates.forEach(function(candidate) {    
+                    var candidateName = d3.selectAll(".N_"+candidate)
+                        .style("opacity", 1.0);
+                })
+            }
+            
+            function cityHighlight(d,i) {
+                var point = d3.select(this)
+                    .style("stroke","#66FF66")
+                    .style("stroke-width","1");
+
+                d3.select("#candidate").text(data[i]["candidate"]);
+                d3.select("#location").text(data[i]["city"] + ', ' + data[i]["state"]);
+                d3.select("#date").text(ddMMyy_format(longDate_format.parse(data[i]["date"])));
+                d3.select("#eventType").text(data[i]["event"]);
+
+                d3.select("#cityFloater")
+                    //.style("top",circle.attr("cy") + "px")
+                //.style("left",circle.attr("cx") + "px")
+                .style("top", d3.event.pageY + "px")
+                .style("left", d3.event.pageX + "px")
+                .style("visibility","visible");
+        }
+        
+            function cityUnhighlight(d,i) {
+                var point = d3.select(this)
+                    .style("stroke","")
+                    .style("stroke-width","");
+
+                d3.select("#cityFloater")
+                    .style("visibility","hidden");
+        }
+            
+            function nameHighlight(d,i) {
+                var point = d3.select(this)
+//                    .style("stroke","#66FF66")
+//                    .style("stroke-width","1");
+                 
+                console.log(point);
+                
+                d3.select("#candidate").text(data[i]["candidate"]);
+
+                d3.select("#nameFloater")
+                    //.style("top",circle.attr("cy") + "px")
+                //.style("left",circle.attr("cx") + "px")
+                .style("top", d3.event.pageY + "px")
+                .style("left", d3.event.pageX + "px")
+                .style("visibility","visible");
+        }
+            
+            
+            function timeLineHighlight(d,i) {
+                var dateLines = d3.select(this)
+                    .style("stroke","#66FF66")
+                    .style("stroke-width","1");
+                 
+                d3.select("#dateLineDate").text(ddMMyy_format(longDate_format.parse(tripDates[i])));
+
+
+                d3.select("#timeLineFloater")
+                    //.style("top",circle.attr("cy") + "px")
+                //.style("left",circle.attr("cx") + "px")
+                .style("top", d3.event.pageY + "px")
+                .style("left", d3.event.pageX + "px")
+                .style("visibility","visible");
+                
+                filterValue(ddMMyy_format(longDate_format.parse(tripDates[i])));
+        }
+        
+            function timeLineUnhighlight(d,i) {
+                var point = d3.select(this)
+                    .style("stroke","")
+                    .style("stroke-width","");
+
+                d3.select("#timeLineFloater")
+                    .style("visibility","hidden");
+                
+                dimAll();
+        }
+        
+                function debateLineHighlight(d,i) {
+                var debateLines = d3.select(this)
+                    .style("stroke","#66FF66")
+                    .style("stroke-width","1");
+                 
+                d3.select("#debateLineDate").text(ddMMyy_format(longDate_format.parse(debateData[i]["date"])));
+                d3.select("#debateLineInfo").text(debateData[i]["description"]);
+
+
+                d3.select("#debateLineFloater")
+                    //.style("top",circle.attr("cy") + "px")
+                //.style("left",circle.attr("cx") + "px")
+                .style("top", d3.event.pageY + "px")
+                .style("left", d3.event.pageX + "px")
+                .style("visibility","visible");
+                
+                filterValue(ddMMyy_format(longDate_format.parse(debateData[i]["date"])));
+        }
+        
+            function debateLineUnhighlight(d,i) {
+                var point = d3.select(this)
+                    .style("stroke","")
+                    .style("stroke-width","");
+
+                d3.select("#debateLineFloater")
+                    .style("visibility","hidden");
+                
+                dimAll();
+        }
+            
+            
+        </script>
+      
+     
+    
+    </head>
+  <body onload="drawMap()">
+      <h3>Travel By US Presidential Candidates During 2016 Primary Season</h3><br />
+<!--      <p class="subtitle">Through Date: <span id="dayText">10-Nov-2014</span></p>-->
+      
+      <svg id="map" width="900" height="500"></svg>
+      
+      <svg id="timeline">
+        <!--<rect x= "30" y="50" width="1070" height="100" fill="#fff" />-->
+          <line x1="50" y1="48" x2="1140" y2="48" style="stroke:gray;stroke-width:1;" />
+      </svg>
+      
+      <div id="controls">   
+         <p>
+            <button onclick="showAll()">Show All</button>
+            <button onclick="dimAll()">Remove All</button>
+        </p>
+          
+          <p>
+          <strong>Filter by Candidate:</strong><br>
+          </p>
+          
+          <div class="row">
+              
+            <div class="col-sm-6">
+                Democratic Candidates:
+                <p.dems id="demNames">
+              
+                 </p.dems>
+            </div>
+            <div class="col-sm-6">
+                Republican Candidates:
+                <p.reps id="repNames">
+               
+                </p.reps>
+              </div>
+          
+      </div>
+    </div>
+      
+       
+      <div id="cityFloater">
+        <span id="candidate" style="font-weight: bold"></span><br />
+        <span id="location" ></span><br />
+        <span id="date"></span><br />
+        <span id="eventType"></span>  
+      </div>
+      
+      <div id="nameFloater">
+         <span id="candidate"></span>  
+      </div>
+      
+      <div id="timeLineFloater">
+        <span id="dateLineDate"></span><br />
+          
+      </div>
+      
+      <div id="debateLineFloater">
+        <span id="debateLineDate"></span><br />
+        <span id="debateLineInfo"></span>  
+      </div>
+      
+     <!-- <div id="wrapper">
+        <input type="range" id="day" min="0" max="542" step="1" value="0" onchange="updateDay(this.value)" />
+      </div>-->
+      
+      
+    
+
+      
+  </body>
+</html>

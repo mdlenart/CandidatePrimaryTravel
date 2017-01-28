@@ -1,0 +1,227 @@
+
+            
+h3 {
+    font-family: sans-serif, Cambria, Arial, Helvetica;
+    font-size: 24px;
+    color: black;
+    text-indent: 130px;
+    text-align: left;
+}
+
+p.subtitle {
+    text-indent: 15px;
+    font-size: 14px;
+}
+
+p {
+    font-family: sans-serif, Cambria, Arial, Helvetica;
+    font-size: 18;
+    text-align: center;
+}
+
+p.dems {
+    text-align: left;
+    
+}
+
+p.reps {
+    text-align: right;
+    
+}
+
+path {
+    stroke: white;
+    stroke-width: 1px;
+    fill: #f1f1f1;
+}
+
+.points circle {
+    fill: #fff;
+    stroke: #1f25c3;
+    stroke-width: 2px;
+
+}
+
+rect {
+            stroke: white;
+            stroke-width: 1.5   ;
+        }
+
+.Hillary_Clinton {stroke:#0000ff; stroke-width: 0.5px; background-color:#0000ff;}
+.Bernie_Sanders {stroke: #000099; stroke-width: 0.5px; background-color:#000099;}
+.Martin_OMalley {stroke: #4c4cff; stroke-width: 0.5px; background-color:#4c4cff;}
+.Lincoln_Chafee {stroke: #0000e5; stroke-width: 0.5px; background-color:#0000e5;}
+.Jim_Webb {stroke: #7f7fff; stroke-width: 0.5px; background-color:#7f7fff;} 
+.Lawrence_Lessig {stroke: #0000b2; stroke-width: 0.5px; background-color:#0000b2;}
+.Donald_Trump {stroke:#ff0000; stroke-width: 0.5px; background-color:#ff0000;}
+.Ted_Cruz {stroke:#e50000; stroke-width: 0.5px; background-color:#e50000;}
+.John_Kasich {stroke: #cc0000; stroke-width: 0.5px; background-color:#cc0000;}
+.Marco_Rubio {stroke: #b20000; stroke-width: 0.5px; background-color:#b20000;}
+.Ben_Carson {stroke: #990000; stroke-width: 0.5px; background-color:#990000;}
+.Chris_Christie {stroke: #7f0000; stroke-width: 0.5px; background-color:#7f0000;}
+.Jeb_Bush {stroke: #660000; stroke-width: 0.5px; background-color:#660000;}
+.Carly_Fiorina {stroke: #ff3232; stroke-width: 0.5px; background-color:#ff3232;}
+.Lindsey_Graham {stroke: #ff4c4c; stroke-width: 0.5px; background-color:#ff4c4c;}
+.Mike_Huckabee {stroke: #ff6666; stroke-width: 0.5px; background-color:#ff6666;}
+.Rick_Santorum {stroke: #ff7f7f; stroke-width: 0.5px; background-color:#ff7f7f;}
+.Rand_Paul {stroke: #ff9999; stroke-width: 0.5px; background-color:#ff9999;}
+.Scott_Walker {stroke: #ffb2b2; stroke-width: 0.5px; background-color:#ffb2b2;}
+.Bobby_Jindal {stroke: #d63232; stroke-width: 0.5px; background-color:#d63232;}
+.Rick_Perry {stroke: #db4c4c; stroke-width: 0.5px; background-color:#db4c4c;}
+.George_Pataki {stroke: #e06666; stroke-width: 0.5px; background-color:#e06666;}
+.Jim_Gilmore {stroke: #e57f7f; stroke-width: 0.5px; background-color:#e57f7f;}
+.Ben_Townhalls {stroke: #ea9999; stroke-width: 0.5px; background-color:#ea9999;}
+
+.N_Hillary_Clinton {stroke:#0000ff; stroke-width: 0.5px; background-color:#0000ff;}
+.N_Bernie_Sanders {stroke: #000099; stroke-width: 0.5px; background-color:#000099;}
+.N_Martin_OMalley {stroke: #4c4cff; stroke-width: 0.5px; background-color:#4c4cff;}
+.N_Lincoln_Chafee {stroke: #0000e5; stroke-width: 0.5px; background-color:#0000e5;}
+.N_Jim_Webb {stroke: #7f7fff; stroke-width: 0.5px; background-color:#7f7fff;} 
+.N_Lawrence_Lessig {stroke: #0000b2; stroke-width: 0.5px; background-color:#0000b2;}
+.N_Donald_Trump {stroke:#ff0000; stroke-width: 0.5px; background-color:#ff0000;}
+.N_Ted_Cruz {stroke:#e50000; stroke-width: 0.5px; background-color:#e50000;}
+.N_John_Kasich {stroke: #a31c20; stroke-width: 0.5px; background-color:#a31c20;}
+.N_Marco_Rubio {stroke: #b20000; stroke-width: 0.5px; background-color:#b20000;}
+.N_Ben_Carson {stroke: #990000; stroke-width: 0.5px; background-color:#990000;}
+.N_Chris_Christie {stroke: #7f0000; stroke-width: 0.5px; background-color:#7f0000;}
+.N_Jeb_Bush {stroke: #660000; stroke-width: 0.5px; background-color:#660000;}
+.N_Carly_Fiorina {stroke: #ff3232; stroke-width: 0.5px; background-color:#ff3232;}
+.N_Lindsey_Graham {stroke: #ff4c4c; stroke-width: 0.5px; background-color:#ff4c4c;}
+.N_Mike_Huckabee {stroke: #ff6666; stroke-width: 0.5px; background-color:#ff6666;}
+.N_Rick_Santorum {stroke: #ff7f7f; stroke-width: 0.5px; background-color:#ff7f7f;}
+.N_Rand_Paul {stroke: #ff9999; stroke-width: 0.5px; background-color:#ff9999;}
+.N_Scott_Walker {stroke: #ffb2b2; stroke-width: 0.5px; background-color:#ffb2b2;}
+.N_Bobby_Jindal {stroke: #d63232; stroke-width: 0.5px; background-color:#d63232;}
+.N_Rick_Perry {stroke: #db4c4c; stroke-width: 0.5px; background-color:#db4c4c;}
+.N_George_Pataki {stroke: #e06666; stroke-width: 0.5px; background-color:#e06666;}
+.N_Jim_Gilmore {stroke: #e57f7f; stroke-width: 0.5px; background-color:#e57f7f;}
+.N_Ben_Townhalls {stroke: #ea9999; stroke-width: 0.5px; background-color:#ea9999;}
+
+.route {
+    fill: none;
+    stroke: #1f25c3;
+    stroke-width: 0.5px;
+}
+
+#controls {
+            position: absolute;
+            top: 40px;
+            left: 930px;
+            width: 250px;
+            font-size: 12px;
+        }
+
+
+ #cityFloater {
+position: absolute;
+top:0px;
+left:0px;
+visibility: hidden;
+font-size: 14px;
+background-color: #FFFFCC;
+padding: 10px;
+box-shadow: 3px 3px 3px #cccccc;
+border-radius: 3px;
+}
+
+ #nameFloater {
+position: absolute;
+top:0px;
+left:0px;
+visibility: hidden;
+font-size: 8px;
+background-color: #FFFFCC;
+padding: 10px;
+box-shadow: 3px 3px 3px #cccccc;
+border-radius: 3px;
+}
+
+#timeLineFloater {
+position: absolute;
+top:0px;
+left:0px;
+visibility: hidden;
+font-size: 14px;
+background-color: #FFFFCC;
+padding: 10px;
+box-shadow: 3px 3px 3px #cccccc;
+border-radius: 3px;
+}
+
+#debateLineFloater {
+position: absolute;
+top:0px;
+left:0px;
+visibility: hidden;
+font-size: 14px;
+background-color: #FFFFCC;
+padding: 10px;
+box-shadow: 3px 3px 3px #cccccc;
+border-radius: 3px;
+}
+
+#candidateNames {
+            font-family: sans-serif, Cambria, Arial, Helvetica;
+            color: white;
+            opacity: 1.0;
+            font-size: 24;
+}
+
+#candidateNames span {
+            padding: 3px;
+            margin: 3px;
+            font-size: 10px;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+#demNames {
+            font-family: sans-serif, Cambria, Arial, Helvetica;
+            color: white;
+            opacity: 1.0;
+            font-size: 24;
+}
+
+#demNames span {
+            padding: 3px;
+            margin: 3px;
+            font-size: 10px;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+
+#repNames {
+            font-family: sans-serif, Cambria, Arial, Helvetica;
+            color: white;
+            opacity: 1.0;
+            font-size: 24;
+}
+
+#repNames span {
+            padding: 3px;
+            margin: 3px;
+            font-size: 10px;
+            text-align: right;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+#wrapper { 
+    position: absolute; 
+    left: 150px; 
+    right: 500px; 
+    top: 600px; 
+    bottom: 640px; 
+} 
+
+#timeline { 
+    position: absolute; 
+    left: 0px;  
+    top: 620px; 
+    height: 150px;
+    width: 1200px;
+} 
+
+
+
